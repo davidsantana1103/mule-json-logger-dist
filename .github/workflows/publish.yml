@@ -34,9 +34,12 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ github.event.inputs.jdk_version }}
+          java-version: ${{ github.event.inputs.jdk_version || '11' }}
           distribution: 'temurin'
           cache: 'maven'
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
       - name: Publish to GitHub Packages
         working-directory: json-logger-source
