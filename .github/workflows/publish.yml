@@ -1,0 +1,48 @@
+name: Build and Publish JSON Logger
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'The tag version from anypointcloud/json-logger to build (e.g. v3.1.0)'
+        required: true
+        default: 'v3.1.0'
+      jdk_version:
+        description: 'JDK version to use'
+        required: true
+        default: '11'
+        type: choice
+        options:
+          - '8'
+          - '11'
+          - '17'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout Original Repository
+        uses: actions/checkout@v4
+        with:
+          repository: anypointcloud/json-logger
+          ref: ${{ github.event.inputs.version_tag }}
+          path: json-logger-source
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ github.event.inputs.jdk_version }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Publish to GitHub Packages
+        working-directory: json-logger-source
+        run: |
+          mvn clean deploy \
+            -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository }} \
+            -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
