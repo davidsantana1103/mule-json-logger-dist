@@ -31,10 +31,12 @@ jobs:
           ref: ${{ github.event.inputs.version_tag }}
           path: json-logger-source
 
-      - name: Set up Maven
-        uses: stefanbuck/github-action-setup-maven@v0.0.1
-        with:
-          maven-version: 3.8.8
+      - name: Install Maven 3.8.8
+        run: |
+          wget https://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz
+          tar -xzf apache-maven-3.8.8-bin.tar.gz
+          echo "MAVEN_HOME=$(pwd)/apache-maven-3.8.8" >> $GITHUB_ENV
+          echo "$(pwd)/apache-maven-3.8.8/bin" >> $GITHUB_PATH
 
       - name: Set up JDK
         uses: actions/setup-java@v4
